@@ -7,22 +7,26 @@ import { faEnvelope, faLock, faUser } from '@fortawesome/free-solid-svg-icons';
 
 const ComponentsAuthLoginForm = () => {
     const router = useRouter();
-    const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
     const submitForm = async (e: React.FormEvent) => {
         e.preventDefault();
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ email, password }),
+            body: JSON.stringify({ username, password }),
         });
 
         if (response.ok) {
-            // Handle successful login
-            router.push('/');
+            const data = await response.json();
+            // Store tokens in local storage
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('refreshToken', data.refreshToken);
+            // Redirect to the home page
+            router.push('/analytics');
         } else {
             // Handle login error
             console.error('Login failed');
@@ -34,12 +38,12 @@ const ComponentsAuthLoginForm = () => {
             <div>
                 <div className="relative text-white-dark">
                     <input
-                        id="Email"
-                        type="email"
+                        id="Username"
+                        type="text"
                         placeholder="Username / Email"
                         className="form-input ps-10 placeholder:text-white-dark"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
                     />
                     <span className="absolute start-4 top-1/2 -translate-y-1/2">
                         <FontAwesomeIcon icon={faUser} className="h-5 w-5 text-white-dark" />
