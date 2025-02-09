@@ -1,9 +1,4 @@
 import ComponentsAuthRegisterForm from '@/components/auth/components-auth-register-form';
-import IconFacebookCircle from '@/components/icon/icon-facebook-circle';
-import IconGoogle from '@/components/icon/icon-google';
-import IconInstagram from '@/components/icon/icon-instagram';
-import IconTwitter from '@/components/icon/icon-twitter';
-import LanguageDropdown from '@/components/language-dropdown';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import React from 'react';

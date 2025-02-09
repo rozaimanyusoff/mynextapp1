@@ -12,11 +12,6 @@ const nextConfig = {
                 destination: '/login',
                 permanent: true,
             },
-            {
-                source: '/register',
-                destination: '/auth/register',
-                permanent: true,
-            },
         ];
     }
 };

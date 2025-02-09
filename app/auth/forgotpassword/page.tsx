@@ -5,7 +5,7 @@ import React from 'react';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-    title: 'Recover Id Box',
+    title: 'Forgot Password',
 };
 
 const BoxedPasswordReset = () => {
