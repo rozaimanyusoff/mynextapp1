@@ -5,38 +5,50 @@ import Link from 'next/link';
 import { API_ENDPOINTS, apiService } from '@/services/api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope, faLock, faUser } from '@fortawesome/free-solid-svg-icons';
+import { LoginCredentials } from '@/types/auth';
 
-const ComponentsAuthLoginForm = () => {
+interface ComponentsAuthLoginFormProps {
+    onError: (error: string) => void;
+}
+
+const ComponentsAuthLoginForm = ({ onError }: ComponentsAuthLoginFormProps) => {
     const router = useRouter();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    const loginUser = async (credentials: { email: string; password: string }) => {
+    const loginUser = async (credentials: LoginCredentials) => {
         try {
-            const response = await apiService.fetchWithAuth(API_ENDPOINTS.auth.login, {
-                method: 'POST',
-                body: JSON.stringify(credentials),
-            });
-            if (response.ok) {
-                const data = await response.json();
-                // Store tokens in local storage
-                localStorage.setItem('token', data.token);
-                localStorage.setItem('refreshToken', data.refreshToken);
-                // Redirect to the home page
-                router.push('/analytics');
-            } else {
-                // Handle login error
-                console.error('Login failed:', response.statusText);
-                throw new Error('Login failed');
-            }
-        } catch (error) {
-            console.error('Login failed:', error);
-            throw error;
+            setError('');
+            setLoading(true);
+            onError('');
+
+            const response = await apiService.login(credentials);
+            
+            // Store tokens
+            localStorage.setItem('token', response.token);
+            localStorage.setItem('refreshToken', response.refreshToken);
+            localStorage.setItem('user', JSON.stringify(response.user));
+
+            // Redirect to dashboard
+            router.push('/analytics');
+            
+        } catch (error: any) {
+            const errorMessage = error.message || 'Login failed. Please try again.';
+            setError(errorMessage);
+            onError(errorMessage);
+            console.error('Login error:', error);
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <form className="space-y-5 dark:text-white" onSubmit={(e) => { e.preventDefault(); loginUser({ email: username, password }); }}>
+        <form className="space-y-5 dark:text-white" onSubmit={(e) => {
+            e.preventDefault();
+            loginUser({ username, password });
+        }}>
             <div>
                 <div className="relative text-white-dark">
                     <input
@@ -76,8 +88,12 @@ const ComponentsAuthLoginForm = () => {
                 </div>
                 <Link href="/forgotpassword" className="text-primary transition font-semibold">Forgot password?</Link>
             </div>
-            <button type="submit" className="btn btn-primary !mt-6 w-full border-0 uppercase shadow-[0_10px_20px_-10px_rgba(67,97,238,0.44)]">
-                Login
+            <button
+                type="submit"
+                className="btn btn-primary !mt-6 w-full border-0 uppercase shadow-[0_10px_20px_-10px_rgba(67,97,238,0.44)]"
+                disabled={loading}
+            >
+                {loading ? 'Logging in...' : 'Login'}
             </button>
         </form>
     );

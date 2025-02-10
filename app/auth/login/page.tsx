@@ -2,11 +2,12 @@
 
 import ComponentsAuthLoginForm from '@/components/auth/components-auth-login-form';
 import Link from 'next/link';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 const Login = () => {
     const router = useRouter();
+    const [loginError, setLoginError] = useState('');
 
     useEffect(() => {
         const isLoggedIn = false; // Replace with actual login check logic
@@ -23,9 +24,11 @@ const Login = () => {
                         <div className="mx-auto w-full max-w-[440px]">
                             <div className="mb-10">
                                 <h1 className="text-3xl font-extrabold uppercase !leading-snug text-zinc-700 md:text-4xl">Login</h1>
-                                <p className="text-base font-bold leading-normal text-white-dark">Enter your username or email, and password to login</p>
+                                <p className={`text-base font-bold leading-normal ${loginError ? 'text-red-500' : 'text-white-dark'}`}>
+                                    {loginError || 'Enter your username or email, and password to login'}
+                                </p>
                             </div>
-                            <ComponentsAuthLoginForm />
+                            <ComponentsAuthLoginForm onError={(error) => setLoginError(error)} />
 
                             <div className="mt-10 text-center dark:text-white">
                                 Don&apos;t have an account ?&nbsp;
