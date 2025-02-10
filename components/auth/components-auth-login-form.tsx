@@ -2,6 +2,7 @@
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { API_ENDPOINTS, apiService } from '@/services/api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope, faLock, faUser } from '@fortawesome/free-solid-svg-icons';
 
@@ -10,31 +11,32 @@ const ComponentsAuthLoginForm = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
-    const submitForm = async (e: React.FormEvent) => {
-        e.preventDefault();
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ username, password }),
-        });
-
-        if (response.ok) {
-            const data = await response.json();
-            // Store tokens in local storage
-            localStorage.setItem('token', data.token);
-            localStorage.setItem('refreshToken', data.refreshToken);
-            // Redirect to the home page
-            router.push('/analytics');
-        } else {
-            // Handle login error
-            console.error('Login failed');
+    const loginUser = async (credentials: { email: string; password: string }) => {
+        try {
+            const response = await apiService.fetchWithAuth(API_ENDPOINTS.auth.login, {
+                method: 'POST',
+                body: JSON.stringify(credentials),
+            });
+            if (response.ok) {
+                const data = await response.json();
+                // Store tokens in local storage
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('refreshToken', data.refreshToken);
+                // Redirect to the home page
+                router.push('/analytics');
+            } else {
+                // Handle login error
+                console.error('Login failed:', response.statusText);
+                throw new Error('Login failed');
+            }
+        } catch (error) {
+            console.error('Login failed:', error);
+            throw error;
         }
     };
 
     return (
-        <form className="space-y-5 dark:text-white" onSubmit={submitForm}>
+        <form className="space-y-5 dark:text-white" onSubmit={(e) => { e.preventDefault(); loginUser({ email: username, password }); }}>
             <div>
                 <div className="relative text-white-dark">
                     <input
