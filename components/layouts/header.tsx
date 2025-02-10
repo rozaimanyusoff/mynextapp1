@@ -146,12 +146,13 @@ const Header = () => {
     const [search, setSearch] = useState(false);
 
     const logout = () => {
-        // Clear tokens from storage
-        localStorage.removeItem('token');
-        localStorage.removeItem('refreshToken');
-        // Redirect to the login page and clear history
+        // Clear tokens from cookies
+        document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+        document.cookie = 'refreshToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+        document.cookie = 'user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+
+        // Redirect to the login page
         router.push('/login');
-        window.location.replace('/login');
     };
 
     const [fontSize, setFontSize] = useState(16); // Default font size

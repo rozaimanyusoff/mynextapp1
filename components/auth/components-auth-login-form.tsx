@@ -26,10 +26,10 @@ const ComponentsAuthLoginForm = ({ onError }: ComponentsAuthLoginFormProps) => {
 
             const response = await apiService.login(credentials);
             
-            // Store tokens
-            localStorage.setItem('token', response.token);
-            localStorage.setItem('refreshToken', response.refreshToken);
-            localStorage.setItem('user', JSON.stringify(response.user));
+            // Store tokens in cookies
+            document.cookie = `token=${response.token}; path=/`;
+            document.cookie = `refreshToken=${response.refreshToken}; path=/`;
+            document.cookie = `user=${JSON.stringify(response.user)}; path=/`;
 
             // Redirect to dashboard
             router.push('/analytics');
