@@ -2,7 +2,6 @@
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { API_ENDPOINTS, apiService } from '@/services/api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope, faLock, faUser } from '@fortawesome/free-solid-svg-icons';
 import { LoginCredentials } from '@/types/auth';
@@ -24,16 +23,30 @@ const ComponentsAuthLoginForm = ({ onError }: ComponentsAuthLoginFormProps) => {
             setLoading(true);
             onError('');
 
-            const response = await apiService.login(credentials);
-            
-            // Store tokens in cookies
-            document.cookie = `token=${response.token}; path=/`;
-            document.cookie = `refreshToken=${response.refreshToken}; path=/`;
-            document.cookie = `user=${JSON.stringify(response.user)}; path=/`;
+            const response = await fetch('/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(credentials),
+            });
 
-            // Redirect to dashboard
-            router.push('/analytics');
-            
+            if (response.ok) {
+                const data = await response.json();
+                
+                // Store tokens in cookies
+                document.cookie = `token=${data.token}; path=/`;
+                document.cookie = `refreshToken=${data.refreshToken}; path=/`;
+                document.cookie = `user=${JSON.stringify(data.user)}; path=/`;
+
+                // Redirect to dashboard
+                router.push('/analytics');
+            } else {
+                const errorData = await response.json();
+                const errorMessage = errorData.error || 'Login failed. Please try again.';
+                setError(errorMessage);
+                onError(errorMessage);
+            }
         } catch (error: any) {
             const errorMessage = error.message || 'Login failed. Please try again.';
             setError(errorMessage);
@@ -86,7 +99,7 @@ const ComponentsAuthLoginForm = ({ onError }: ComponentsAuthLoginFormProps) => {
                         <span className="text-white-dark">Remember me</span>
                     </label>
                 </div>
-                <Link href="/forgotpassword" className="text-primary transition font-semibold">Forgot password?</Link>
+                <Link href="/auth/forgotpassword" className="text-primary transition font-semibold">Forgot password?</Link>
             </div>
             <button
                 type="submit"
