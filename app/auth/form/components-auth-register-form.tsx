@@ -31,7 +31,7 @@ const ComponentsAuthRegisterForm = ({ onError }: ComponentsAuthRegisterFormProps
             });
 
             if (response.ok) {
-                router.push('/auth/activation-sent');
+                router.push('/auth/login');
             } else {
                 const errorData = await response.json();
                 const errorMessage = errorData.error || 'Registration failed. Please try again.';
