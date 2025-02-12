@@ -3,7 +3,7 @@ import pool from "@/config/db";
 
 export async function POST(req: Request) {
     try {
-        const { email, contact } = await req.json();
+        const { email, contact, activationCode } = await req.json();
 
         if (!email || !contact) {
             return NextResponse.json({ error: "Email and contact are required" }, { status: 400 });
@@ -11,8 +11,8 @@ export async function POST(req: Request) {
 
         const client = await pool.connect();
         const result = await client.query(
-            "SELECT * FROM users WHERE email = $1 AND contact = $2",
-            [email, contact]
+            "SELECT * FROM users WHERE email = $1 AND contact = $2 AND activation_code = $3",
+            [email, contact, activationCode]
         );
         client.release();
 

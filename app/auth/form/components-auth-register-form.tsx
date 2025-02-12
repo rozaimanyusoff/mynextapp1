@@ -15,6 +15,7 @@ const ComponentsAuthRegisterForm = ({ onError }: ComponentsAuthRegisterFormProps
     const [email, setEmail] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [isChecked, setIsChecked] = useState(false);
 
     const registerUser = async () => {
         try {
@@ -47,6 +48,13 @@ const ComponentsAuthRegisterForm = ({ onError }: ComponentsAuthRegisterFormProps
         }
     };
 
+    const handleContactChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        if (/^\d*$/.test(value)) {
+            setContact(value);
+        }
+    };
+
     return (
         <form className="space-y-5 dark:text-white" onSubmit={(e) => {
             e.preventDefault();
@@ -75,7 +83,7 @@ const ComponentsAuthRegisterForm = ({ onError }: ComponentsAuthRegisterFormProps
                         placeholder="Enter contact"
                         className="form-input ps-10 placeholder:text-white-dark"
                         value={contact}
-                        onChange={(e) => setContact(e.target.value)}
+                        onChange={handleContactChange}
                     />
                     <span className="absolute start-4 top-1/2 -translate-y-1/2">
                         <FontAwesomeIcon icon={faPhone} className="h-5 w-5 text-white-dark" />
@@ -99,14 +107,19 @@ const ComponentsAuthRegisterForm = ({ onError }: ComponentsAuthRegisterFormProps
             </div>
             <div>
                 <label className="flex cursor-pointer items-center">
-                    <input type="checkbox" className="form-checkbox bg-white dark:bg-black" />
+                    <input
+                        type="checkbox"
+                        className="form-checkbox bg-white dark:bg-black"
+                        checked={isChecked}
+                        onChange={(e) => setIsChecked(e.target.checked)}
+                    />
                     <span className="text-white-dark">I declare the above information is true and correct</span>
                 </label>
             </div>
             <button
                 type="submit"
                 className="btn btn-primary !mt-6 w-full border-0 uppercase shadow-[0_10px_20px_-10px_rgba(67,97,238,0.44)]"
-                disabled={loading}
+                disabled={loading || !isChecked}
             >
                 {loading ? 'Registering...' : 'Register'}
             </button>

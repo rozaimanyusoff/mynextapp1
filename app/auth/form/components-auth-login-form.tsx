@@ -3,8 +3,7 @@ import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEnvelope, faLock, faUser } from '@fortawesome/free-solid-svg-icons';
-import { LoginCredentials } from '@/types/auth';
+import { faEnvelope, faLock, faUser, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 
 interface ComponentsAuthLoginFormProps {
     onError: (error: string) => void;
@@ -12,12 +11,18 @@ interface ComponentsAuthLoginFormProps {
 
 const ComponentsAuthLoginForm = ({ onError }: ComponentsAuthLoginFormProps) => {
     const router = useRouter();
-    const [username, setUsername] = useState('');
+    const [identifier, setIdentifier] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const [rememberMe, setRememberMe] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const loginUser = async (credentials: LoginCredentials) => {
+    const toggleShowPassword = () => {
+        setShowPassword(!showPassword);
+    };
+
+    const loginUser = async () => {
         try {
             setError('');
             setLoading(true);
@@ -28,20 +33,28 @@ const ComponentsAuthLoginForm = ({ onError }: ComponentsAuthLoginFormProps) => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(credentials),
+                body: JSON.stringify({ identifier, password, rememberMe }),
             });
 
-            const data = await response.json();
-
             if (response.ok) {
-                // Store tokens in cookies with secure settings
-                document.cookie = `token=${data.token}; path=/; secure; samesite=strict`;
-                document.cookie = `refreshToken=${data.refreshToken}; path=/; secure; samesite=strict`;
-                document.cookie = `user=${JSON.stringify(data.user)}; path=/; secure; samesite=strict`;
+                const data = await response.json();
+                
+                // Store tokens in cookies
+                const expires = rememberMe ? `; expires=${new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toUTCString()}` : '';
+                document.cookie = `token=${data.token}; path=/${expires}`;
+                document.cookie = `refreshToken=${data.refreshToken}; path=/${expires}`;
+                document.cookie = `user=${JSON.stringify(data.user)}; path=/${expires}`;
 
-                router.push('/analytics');
+                // Store user ID in local storage
+                localStorage.setItem('userId', data.user.id);
+
+                // Redirect to dashboard
+                router.push(data.user.last_nav || '/analytics');
             } else {
-                throw new Error(data.error || 'Login failed');
+                const errorData = await response.json();
+                const errorMessage = errorData.error || 'Login failed. Please try again.';
+                setError(errorMessage);
+                onError(errorMessage);
             }
         } catch (error: any) {
             const errorMessage = error.message || 'Login failed. Please try again.';
@@ -56,17 +69,17 @@ const ComponentsAuthLoginForm = ({ onError }: ComponentsAuthLoginFormProps) => {
     return (
         <form className="space-y-5 dark:text-white" onSubmit={(e) => {
             e.preventDefault();
-            loginUser({ username, password });
+            loginUser();
         }}>
             <div>
                 <div className="relative text-white-dark">
                     <input
-                        id="Username"
+                        id="Identifier"
                         type="text"
-                        placeholder="Username / Email"
+                        placeholder="Username or Email"
                         className="form-input ps-10 placeholder:text-white-dark"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
+                        value={identifier}
+                        onChange={(e) => setIdentifier(e.target.value)}
                     />
                     <span className="absolute start-4 top-1/2 -translate-y-1/2">
                         <FontAwesomeIcon icon={faUser} className="h-5 w-5 text-white-dark" />
@@ -77,7 +90,7 @@ const ComponentsAuthLoginForm = ({ onError }: ComponentsAuthLoginFormProps) => {
                 <div className="relative text-white-dark">
                     <input
                         id="Password"
-                        type="password"
+                        type={showPassword ? "text" : "password"}
                         placeholder="Enter Password"
                         className="form-input ps-10 placeholder:text-white-dark"
                         value={password}
@@ -86,12 +99,21 @@ const ComponentsAuthLoginForm = ({ onError }: ComponentsAuthLoginFormProps) => {
                     <span className="absolute start-4 top-1/2 -translate-y-1/2">
                         <FontAwesomeIcon icon={faLock} className="h-5 w-5 text-white-dark" />
                     </span>
+                    <span className="absolute end-4 top-1/2 -translate-y-1/2 cursor-pointer" onClick={toggleShowPassword}>
+                        <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} className="h-5 w-5 text-white-dark" />
+                    </span>
                 </div>
             </div>
             <div className="flex items-center justify-between">
                 <div>
                     <label className="flex cursor-pointer items-center">
-                        <input type="checkbox" id="RememberMe" className="form-checkbox bg-white dark:bg-black" />
+                        <input
+                            type="checkbox"
+                            id="RememberMe"
+                            className="form-checkbox bg-white dark:bg-black"
+                            checked={rememberMe}
+                            onChange={(e) => setRememberMe(e.target.checked)}
+                        />
                         <span className="text-white-dark">Remember me</span>
                     </label>
                 </div>
