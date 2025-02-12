@@ -1,6 +1,6 @@
 "use client";
 
-import ComponentsAuthLoginForm from '@/components/auth/components-auth-login-form';
+import ComponentsAuthLoginForm from '@/app/auth/form/components-auth-login-form';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -12,7 +12,7 @@ const Login = () => {
     useEffect(() => {
         const isLoggedIn = false; // Replace with actual login check logic
         if (!isLoggedIn) {
-            router.push('/');
+            router.push('/auth/login');
         }
     }, [router]);
 

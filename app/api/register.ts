@@ -14,6 +14,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 
         try {
             const client = await pool.connect();
+
+            // Check if user already exists
+            const checkUser = await client.query(
+                'SELECT email FROM users WHERE email = $1',
+                [email]
+            );
+
+            if (checkUser.rows.length > 0) {
+                client.release();
+                return res.status(400).json({ error: 'User with this email already exists' });
+            }
+
             const activationCode = crypto.randomBytes(20).toString('hex');
 
             await client.query(
@@ -24,15 +36,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 
             // Send activation email
             const transporter = nodemailer.createTransport({
-                service: 'gmail',
+                host: process.env.SMTP_HOST,
+                port: Number(process.env.SMTP_PORT),
                 auth: {
-                    user: process.env.EMAIL_USER,
-                    pass: process.env.EMAIL_PASS,
+                    user: process.env.SMTP_USER,
+                    pass: process.env.SMTP_PASSWORD,
                 },
             });
 
             const mailOptions = {
-                from: process.env.EMAIL_USER,
+                from: `"${process.env.SMTP_FROM_NAME}" <${process.env.SMTP_FROM_EMAIL}>`,
                 to: email,
                 subject: 'Account Activation',
                 text: `Please activate your account by clicking the following link: ${process.env.NEXT_PUBLIC_API_URL}/auth/activate?code=${activationCode}`,
@@ -42,6 +55,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 
             res.status(201).json({ message: 'Registration successful. Please check your email for activation link.' });
         } catch (error) {
+            console.error('Registration error:', error);
             res.status(500).json({ error: 'Internal server error' });
         }
     } else {

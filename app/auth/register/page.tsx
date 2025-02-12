@@ -1,14 +1,19 @@
-import ComponentsAuthRegisterForm from '@/components/auth/components-auth-register-form';
+"use client";
+
+import ComponentsAuthRegisterForm from '@/app/auth/form/components-auth-register-form';
 import { Metadata } from 'next';
 import Link from 'next/link';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
-export const metadata: Metadata = {
-    title: 'Register Boxed',
-};
+/* export const metadata: Metadata = {
+    title: 'Register',
+}; */
 
-const BoxedSignUp = () => {
+
+const Register = () => {
     const bgImage = process.env.NEXT_PUBLIC_AUTH_BG_IMAGE || '/assets/images/auth/map.png';
+    const [registerError, setRegisterError] = useState('');
+
     return (
         <div>
 
@@ -18,14 +23,15 @@ const BoxedSignUp = () => {
                         <div className="mx-auto w-full max-w-[440px]">
                             <div className="mb-10">
                                 <h1 className="text-3xl font-extrabold uppercase !leading-snug text-zinc-700 md:text-4xl">Register</h1>
-                                <p className="text-base font-bold leading-normal text-white-dark">Enter your email and password to register</p>
+                                <p className={`text-base font-bold leading-normal ${registerError ? 'text-red-500' : 'text-white-dark'}`}>
+                                    {registerError || 'Enter your email and password to register'}
+                                </p>
                             </div>
-                            <ComponentsAuthRegisterForm />
+                            <ComponentsAuthRegisterForm onError={(error) => setRegisterError(error)} />
 
-                            
                             <div className="text-center mt-10 dark:text-white">
                                 Already have an account ?&nbsp;
-                                <Link href="/" className="uppercase text-primary underline transition hover:text-black dark:hover:text-white">
+                                <Link href="/auth/login" className="uppercase text-primary underline transition hover:text-black dark:hover:text-white">
                                     Login
                                 </Link>
                             </div>
@@ -37,4 +43,4 @@ const BoxedSignUp = () => {
     );
 };
 
-export default BoxedSignUp;
+export default Register;

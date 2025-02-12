@@ -31,21 +31,17 @@ const ComponentsAuthLoginForm = ({ onError }: ComponentsAuthLoginFormProps) => {
                 body: JSON.stringify(credentials),
             });
 
-            if (response.ok) {
-                const data = await response.json();
-                
-                // Store tokens in cookies
-                document.cookie = `token=${data.token}; path=/`;
-                document.cookie = `refreshToken=${data.refreshToken}; path=/`;
-                document.cookie = `user=${JSON.stringify(data.user)}; path=/`;
+            const data = await response.json();
 
-                // Redirect to dashboard
+            if (response.ok) {
+                // Store tokens in cookies with secure settings
+                document.cookie = `token=${data.token}; path=/; secure; samesite=strict`;
+                document.cookie = `refreshToken=${data.refreshToken}; path=/; secure; samesite=strict`;
+                document.cookie = `user=${JSON.stringify(data.user)}; path=/; secure; samesite=strict`;
+
                 router.push('/analytics');
             } else {
-                const errorData = await response.json();
-                const errorMessage = errorData.error || 'Login failed. Please try again.';
-                setError(errorMessage);
-                onError(errorMessage);
+                throw new Error(data.error || 'Login failed');
             }
         } catch (error: any) {
             const errorMessage = error.message || 'Login failed. Please try again.';

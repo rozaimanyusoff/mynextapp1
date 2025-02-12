@@ -1,4 +1,4 @@
-import ComponentsAuthResetPasswordForm from '@/components/auth/components-auth-reset-password-form';
+import ComponentsAuthResetPasswordForm from '@/app/auth/form/components-auth-reset-password-form';
 import LanguageDropdown from '@/components/language-dropdown';
 import { Metadata } from 'next';
 import React from 'react';

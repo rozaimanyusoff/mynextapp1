@@ -4,7 +4,11 @@ import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope, faPhone, faUser } from '@fortawesome/free-solid-svg-icons';
 
-const ComponentsAuthRegisterForm = () => {
+interface ComponentsAuthRegisterFormProps {
+    onError: (error: string) => void;
+}
+
+const ComponentsAuthRegisterForm = ({ onError }: ComponentsAuthRegisterFormProps) => {
     const router = useRouter();
     const [fullname, setFullname] = useState('');
     const [contact, setContact] = useState('');
@@ -16,6 +20,7 @@ const ComponentsAuthRegisterForm = () => {
         try {
             setError('');
             setLoading(true);
+            onError('');
 
             const response = await fetch('/api/register', {
                 method: 'POST',
@@ -35,6 +40,7 @@ const ComponentsAuthRegisterForm = () => {
         } catch (error: any) {
             const errorMessage = error.message || 'Registration failed. Please try again.';
             setError(errorMessage);
+            onError(errorMessage);
             console.error('Registration error:', error);
         } finally {
             setLoading(false);
@@ -104,7 +110,6 @@ const ComponentsAuthRegisterForm = () => {
             >
                 {loading ? 'Registering...' : 'Register'}
             </button>
-            {error && <p className="text-red-500">{error}</p>}
         </form>
     );
 };

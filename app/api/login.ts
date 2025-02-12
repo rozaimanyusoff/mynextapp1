@@ -5,12 +5,14 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
 type Data = {
+    success: boolean;
     token: string;
     refreshToken: string;
     user: {
         id: number;
         username: string;
     };
+    error?: string; // Add optional error field for better error handling in client-side code.
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<Data | { error: string }>) {
@@ -36,6 +38,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
             const refreshToken = jwt.sign({ userId: user.id }, process.env.JWT_REFRESH_SECRET!, { expiresIn: '7d' });
 
             res.status(200).json({
+                success: true,
                 token,
                 refreshToken,
                 user: {

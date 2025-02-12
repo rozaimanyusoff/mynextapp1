@@ -1,7 +1,7 @@
 // filepath: /Users/rozaiman/mynextapp1/app/auth/activate/page.tsx
 "use client";
 
-import ComponentsAuthActivateForm from '@/components/auth/components-auth-activate-form';
+import ComponentsAuthActivateForm from '@/app/auth/form/components-auth-activate-form';
 import React from 'react';
 
 const Activate = () => {
