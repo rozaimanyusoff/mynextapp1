@@ -1,6 +1,6 @@
 "use client";
 
-import ComponentsAuthLoginForm from '@/app/auth/form/components-auth-login-form';
+import ComponentsAuthLoginForm from '@/app/auth/form/login-form';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';

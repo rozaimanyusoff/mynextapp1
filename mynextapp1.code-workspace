@@ -4,5 +4,30 @@
 			"path": "../../.."
 		}
 	],
-	"settings": {}
+	"settings": {
+		"sqltools.connections": [
+			{
+				"mysqlOptions": {
+					"authProtocol": "default",
+					"enableSsl": "Disabled"
+				},
+				"previewLimit": 50,
+				"server": "50.50.10.27",
+				"port": 3306,
+				"driver": "MySQL",
+				"name": "db.27",
+				"database": "auth",
+				"username": "smart"
+			},
+			{
+				"previewLimit": 50,
+				"server": "localhost",
+				"port": 5432,
+				"driver": "PostgreSQL",
+				"name": "macminipg",
+				"database": "mydb",
+				"username": "myuser"
+			}
+		]
+	}
 }

@@ -8,7 +8,7 @@ function createEncryptedToken(data: { token: string; expiry: Date }): string {
     const secretKey = process.env.JWT_SECRET || 'my_secret_key';
     const dataString = JSON.stringify(data);
     const iv = crypto.randomBytes(16);
-    const cipher = crypto.createCipheriv('aes-256-gcm', new Uint8Array(Buffer.from(secretKey.padEnd(32))), iv);
+    const cipher = crypto.createCipheriv('aes-256-gcm', Buffer.from(secretKey.padEnd(32)), iv);
 
     let encrypted = cipher.update(dataString, 'utf8', 'hex');
     encrypted += cipher.final('hex');

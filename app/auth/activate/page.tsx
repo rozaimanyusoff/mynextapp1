@@ -1,6 +1,6 @@
 "use client";
 
-import ComponentsAuthActivateForm from '@/app/auth/form/components-auth-activate-form';
+import ComponentsAuthActivateForm from '@/app/auth/form/activate-form';
 import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 

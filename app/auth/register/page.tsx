@@ -1,6 +1,6 @@
 "use client";
 
-import ComponentsAuthRegisterForm from '@/app/auth/form/components-auth-register-form';
+import ComponentsAuthRegisterForm from '@/app/auth/form/register-form';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
