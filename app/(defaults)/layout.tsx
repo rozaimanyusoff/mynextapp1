@@ -12,7 +12,7 @@ import useUpdateLastNav from '@/hooks/useUpdateLastNav';
 
 export default function DefaultLayout({ children }: { children: React.ReactNode }) {
     useUpdateLastNav();
-    
+
     return (
         <>
             {/* BEGIN MAIN CONTAINER */}

@@ -1,15 +1,17 @@
-import ComponentsAuthResetPasswordForm from '@/app/auth/form/components-auth-reset-password-form';
+"use client";
+import ComponentsAuthResetPasswordForm from '@/app/auth/form/forgot-password-form';
 import LanguageDropdown from '@/components/language-dropdown';
 import { Metadata } from 'next';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 
-export const metadata: Metadata = {
+/* export const metadata: Metadata = {
     title: 'Forgot Password',
-};
+}; */
 
 const BoxedPasswordReset = () => {
-    
+    const [errors, setErrors] = useState('');
+
     return (
         <div>
 
@@ -20,9 +22,9 @@ const BoxedPasswordReset = () => {
                         <div className="mx-auto w-full max-w-[440px]">
                             <div className="mb-7">
                                 <h1 className="mb-3 text-2xl font-bold !leading-snug dark:text-white">Password Reset</h1>
-                                <p>Enter your email to recover your ID</p>
+                                <p className={`text-base font-bold leading-normal ${errors ? 'text-red-500' : 'text-white-dark'}`}>{errors || 'Enter your email to recover your ID'}</p>
                             </div>
-                            <ComponentsAuthResetPasswordForm />
+                            <ComponentsAuthResetPasswordForm onError={(error) => setErrors(error)} />
                             <div className="mt-10 text-center dark:text-white">
                                 <Link href="/login" className=" text-primary transition hover:text-black dark:hover:text-white">
                                     Back to login

@@ -1,11 +1,20 @@
-// filepath: /Users/rozaiman/mynextapp1/app/auth/activate/page.tsx
 "use client";
 
 import ComponentsAuthActivateForm from '@/app/auth/form/components-auth-activate-form';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 const Activate = () => {
     const [error, setError] = useState('');
+    const searchParams = useSearchParams();
+    const [message, setMessage] = useState('');
+
+    useEffect(() => {
+        const msg = searchParams.get('message');
+        if (msg) {
+            setMessage(msg);
+        }
+    }, [searchParams]);
 
     return (
         <div>
@@ -15,9 +24,15 @@ const Activate = () => {
                         <div className="mx-auto w-full max-w-[440px]">
                             <div className="mb-10">
                                 <h1 className="text-3xl font-extrabold uppercase !leading-snug text-zinc-700 md:text-4xl">Activate Account</h1>
-                                <p className={`text-base font-bold leading-normal ${ error ? 'text-red-500' : 'text-white-dark'}`}>
-                                    {error || 'Enter your email and contact provided during registration to verify your account'}
-                                </p>
+                                {message ? (
+                                    <p className="text-base font-bold leading-normal text-amber-500">
+                                        {message}
+                                    </p>
+                                ) : (
+                                    <p className={`text-base font-bold leading-normal ${error ? 'text-red-500' : 'text-white-dark'}`}>
+                                        {error || 'Enter your email and contact provided during registration to verify your account'}
+                                    </p>
+                                )}
                             </div>
                             <ComponentsAuthActivateForm onError={(error) => setError(error)} />
                         </div>

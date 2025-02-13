@@ -3,11 +3,20 @@
 import ComponentsAuthLoginForm from '@/app/auth/form/components-auth-login-form';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 const Login = () => {
     const router = useRouter();
     const [loginError, setLoginError] = useState('');
+    const searchParams = useSearchParams();
+    const [message, setMessage] = useState('');
+
+    useEffect(() => {
+        const msg = searchParams.get('message');
+        if (msg) {
+            setMessage(msg);
+        }
+    }, [searchParams]);
 
     useEffect(() => {
         const isLoggedIn = false; // Replace with actual login check logic
@@ -24,9 +33,15 @@ const Login = () => {
                         <div className="mx-auto w-full max-w-[440px]">
                             <div className="mb-10">
                                 <h1 className="text-3xl font-extrabold uppercase !leading-snug text-zinc-700 md:text-4xl">Login</h1>
-                                <p className={`text-base font-bold leading-normal ${loginError ? 'text-red-500' : 'text-white-dark'}`}>
-                                    {loginError || 'Enter your username or email, and password to login'}
-                                </p>
+                                {message ? (
+                                    <p className="text-base font-bold leading-normal text-green-500">
+                                        {message}
+                                    </p>
+                                ) : (
+                                    <p className={`text-base font-bold leading-normal ${loginError ? 'text-red-500' : 'text-white-dark'}`}>
+                                        {loginError || 'Enter your username or email, and password to login'}
+                                    </p>
+                                )}
                             </div>
                             <ComponentsAuthLoginForm onError={(error) => setLoginError(error)} />
 

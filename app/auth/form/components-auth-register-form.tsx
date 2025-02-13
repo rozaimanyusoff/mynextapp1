@@ -32,11 +32,13 @@ const ComponentsAuthRegisterForm = ({ onError }: ComponentsAuthRegisterFormProps
             });
 
             if (response.ok) {
-                router.push('/auth/login');
+                // Pass success message through router navigation
+                router.push('/auth/login?message=Registration successful. Please check your email for activation link.');
             } else {
                 const errorData = await response.json();
                 const errorMessage = errorData.error || 'Registration failed. Please try again.';
                 setError(errorMessage);
+                onError(errorMessage);
             }
         } catch (error: any) {
             const errorMessage = error.message || 'Registration failed. Please try again.';
@@ -66,7 +68,7 @@ const ComponentsAuthRegisterForm = ({ onError }: ComponentsAuthRegisterFormProps
                         id="Fullname"
                         type="text"
                         placeholder="Enter fullname"
-                        className="form-input ps-10 placeholder:text-white-dark"
+                        className="form-input ps-10 capitalize placeholder:text-white-dark"
                         value={fullname}
                         onChange={(e) => setFullname(e.target.value)}
                     />

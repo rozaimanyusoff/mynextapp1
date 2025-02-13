@@ -38,7 +38,7 @@ const ComponentsAuthLoginForm = ({ onError }: ComponentsAuthLoginFormProps) => {
 
             if (response.ok) {
                 const data = await response.json();
-                
+
                 // Store tokens in cookies
                 const expires = rememberMe ? `; expires=${new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toUTCString()}` : '';
                 document.cookie = `token=${data.token}; path=/${expires}`;

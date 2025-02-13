@@ -2,7 +2,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEnvelope, faLock, faUser, faPhone, faUserTag } from "@fortawesome/free-solid-svg-icons";
+import { faEnvelope, faLock, faUser, faPhone, faUserTag, faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 
 interface ComponentsAuthActivateFormProps {
     onError: (error: string) => void;
@@ -18,10 +18,12 @@ const ComponentsAuthActivateForm = ({ onError }: ComponentsAuthActivateFormProps
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const [isVerified, setIsVerified] = useState(false);
-    const [userType, setUserType] = useState("1"); // Default: Employee
+    const [userType, setUserType] = useState(""); // Default: Employee
+    const [touchedFields, setTouchedFields] = useState<{ [key: string]: boolean }>({});
 
     useEffect(() => {
         const code = searchParams.get("code");
@@ -93,9 +95,9 @@ const ComponentsAuthActivateForm = ({ onError }: ComponentsAuthActivateFormProps
             }
 
             if (!validatePassword(password)) {
-                setError("Password must be at least 6 characters, include 1 uppercase, 1 number, and 1 symbol.");
+                setError("Password must be at least 6 characters, include 1 uppercase, 1 number, and 1 special character.");
                 setLoading(false);
-                onError("Password must be at least 6 characters, include 1 uppercase, 1 number, and 1 symbol.");
+                onError("Password must be at least 6 characters, include 1 uppercase, 1 number, and 1 special character.");
                 return;
             }
 
@@ -155,6 +157,20 @@ const ComponentsAuthActivateForm = ({ onError }: ComponentsAuthActivateFormProps
         }
     };
 
+    const toggleShowPassword = () => {
+        setShowPassword(!showPassword);
+    };
+
+    const handleBlur = (fieldName: string) => {
+        setTouchedFields(prev => ({ ...prev, [fieldName]: true }));
+    };
+
+    const getFieldClassName = (fieldName: string, value: string, isSelect: boolean = false) => {
+        const baseClasses = isSelect ? "form-select ps-10 placeholder:text-white-dark" : "form-input ps-10 placeholder:text-white-dark";
+        const validationClasses = touchedFields[fieldName] && !value ? 'ring-1 ring-red-500' : '';
+        return `${baseClasses} ${validationClasses}`.trim();
+    };
+
     return (
         <div>
             <form className="space-y-5 dark:text-white" onSubmit={handleSubmit}>
@@ -163,9 +179,10 @@ const ComponentsAuthActivateForm = ({ onError }: ComponentsAuthActivateFormProps
                         id="Email"
                         type="email"
                         placeholder="Enter email"
-                        className="form-input ps-10 placeholder:text-white-dark"
+                        className={getFieldClassName('email', email)}
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        onBlur={() => handleBlur('email')}
                         disabled={isVerified}
                     />
                     <span className="absolute start-4 top-1/2 -translate-y-1/2">
@@ -178,9 +195,10 @@ const ComponentsAuthActivateForm = ({ onError }: ComponentsAuthActivateFormProps
                         id="Contact"
                         type="text"
                         placeholder="Enter contact"
-                        className="form-input ps-10 placeholder:text-white-dark"
+                        className={getFieldClassName('contact', contact)}
                         value={contact}
                         onChange={handleContactChange}
+                        onBlur={() => handleBlur('contact')}
                         disabled={isVerified}
                     />
                     <span className="absolute start-4 top-1/2 -translate-y-1/2">
@@ -193,10 +211,12 @@ const ComponentsAuthActivateForm = ({ onError }: ComponentsAuthActivateFormProps
                         <div className="relative text-white-dark">
                             <select
                                 id="UserType"
-                                className="form-select ps-10 placeholder:text-white-dark"
+                                className={getFieldClassName('userType', userType, true)}
                                 value={userType}
                                 onChange={(e) => setUserType(e.target.value)}
+                                onBlur={() => handleBlur('userType')}
                             >
+                                <option value="">Select user type</option>
                                 <option value="1">Employee</option>
                                 <option value="2">Non-Employee</option>
                             </select>
@@ -210,9 +230,10 @@ const ComponentsAuthActivateForm = ({ onError }: ComponentsAuthActivateFormProps
                                 id="Username"
                                 type="text"
                                 placeholder="Enter username"
-                                className="form-input ps-10 placeholder:text-white-dark"
+                                className={getFieldClassName('username', username)}
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
+                                onBlur={() => handleBlur('username')}
                             />
                             <span className="absolute start-4 top-1/2 -translate-y-1/2">
                                 <FontAwesomeIcon icon={faUser} className="h-5 w-5 text-white-dark" />
@@ -222,26 +243,31 @@ const ComponentsAuthActivateForm = ({ onError }: ComponentsAuthActivateFormProps
                         <div className="relative text-white-dark">
                             <input
                                 id="Password"
-                                type="password"
+                                type={showPassword ? "text" : "password"}
                                 placeholder="Enter password"
-                                className="form-input ps-10 placeholder:text-white-dark"
+                                className={getFieldClassName('password', password)}
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
+                                onBlur={() => handleBlur('password')}
                             />
                             <span className="absolute start-4 top-1/2 -translate-y-1/2">
                                 <FontAwesomeIcon icon={faLock} className="h-5 w-5 text-white-dark" />
                             </span>
+                            <span className="absolute end-4 top-1/2 -translate-y-1/2 cursor-pointer" onClick={toggleShowPassword}>
+                                <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} className="h-5 w-5 text-white-dark" />
+                            </span>
                         </div>
-                        <small className="text-red-500 font-semibold">Password must be at least 6 characters long, include 1 uppercase letter, 1 number, and 1 special character (@$!%*?&).</small>
+                        <small className="text-red-500 font-semibold">Password must be at least 6 characters long, include 1 uppercase letter, 1 number, and 1 special character.</small>
 
                         <div className="relative text-white-dark">
                             <input
                                 id="ConfirmPassword"
-                                type="password"
+                                type={showPassword ? "text" : "password"}
                                 placeholder="Confirm password"
-                                className="form-input ps-10 placeholder:text-white-dark"
+                                className={getFieldClassName('confirmPassword', confirmPassword)}
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
+                                onBlur={() => handleBlur('confirmPassword')}
                             />
                             <span className="absolute start-4 top-1/2 -translate-y-1/2">
                                 <FontAwesomeIcon icon={faLock} className="h-5 w-5 text-white-dark" />
